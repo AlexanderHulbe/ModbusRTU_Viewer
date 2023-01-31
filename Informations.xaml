@@ -1,0 +1,26 @@
+﻿<Page x:Class="ModbusRTU_Viewer.Informations"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ModbusRTU_Viewer"
+      mc:Ignorable="d" 
+      d:DesignHeight="554.04" d:DesignWidth="900"
+      Title="Informations">
+
+    <Grid>
+        <ListView 
+            d:ItemsSource="{d:SampleData ItemCount=5}"
+            >
+            <ListView.View>
+                <GridView
+                    x:Name="View"
+                    >
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+    </Grid>
+
+
+</Page>

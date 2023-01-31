@@ -1,0 +1,20 @@
+﻿{
+	"Name": "BAUER Kraftmessdose",
+	"Headers": [
+		"Slave Adress",
+		"Register",
+		"Wert",
+		"Messwert",
+		"Einheit"
+	],
+	"Slaves_Count":5,
+	"DataModel": 
+		{
+			"Name": "Force Integer",
+			"Address": "40052",
+			"Type": "HoldingRegister",
+			"count_of_Addresses": 2,
+			"DataType": "uint32",
+			"Unit": "kN"
+	}
+}
