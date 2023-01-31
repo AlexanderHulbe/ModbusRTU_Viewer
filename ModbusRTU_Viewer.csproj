@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>modbusrtu-high-resolution-logo-color-on-transparent-background.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EasyModbus, Version=5.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\EasyModbusTCP.5.6.0\lib\net40\EasyModbus.dll</HintPath>
@@ -111,6 +114,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="modbusrtu-viewer-high-resolution-logo-color-on-transparent-background.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="modbusrtu-high-resolution-logo-color-on-transparent-background.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

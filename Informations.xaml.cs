@@ -12,10 +12,13 @@ namespace ModbusRTU_Viewer
     /// </summary>
     public partial class Informations : Page
     {
-        dynamic config = null;
+        public dynamic config = null;
         List<String> headers = new List<String>();
-        DataModel dataModel;
-        int slaves = 0;
+        public DataModel dataModel;
+        public int slaves = 0;
+        public System.IO.Ports.StopBits stopBits;
+        public int Baudrate;
+        public System.IO.Ports.Parity parity;
 
         public Informations(string path)
         {
@@ -30,6 +33,10 @@ namespace ModbusRTU_Viewer
             {
                 string json = r.ReadToEnd();
                 config = JsonConvert.DeserializeObject(json);
+
+                Console.WriteLine("{0}", config);
+
+
                 var len_headers = config.Headers.Count;
                 foreach (string item in config.Headers)
                 {
@@ -41,7 +48,36 @@ namespace ModbusRTU_Viewer
                     View.Columns.Add(col);
                 }
 
+
                 slaves = config.Slaves_Count;
+                Baudrate = (int)config.Baudrate;
+                dynamic _stopBits = "";
+                switch ((double)config.StopBits.Value)
+                {
+                    case 0:
+                        _stopBits = "None";
+                        break;
+                    case 1:
+                        _stopBits = "One";
+                        break;
+                    case 2:
+                        _stopBits = "Two";
+                        break;
+                    case 1.5:
+                        _stopBits = "OnePointFive";
+                        break;
+                    default:
+                        _stopBits = "One";
+                        break;
+                }
+                _stopBits = _stopBits.Replace("\"", "");
+                Enum.TryParse<System.IO.Ports.StopBits>(_stopBits, out System.IO.Ports.StopBits stopBits);
+                this.stopBits = stopBits;
+                
+                var _parity = config.Parity.Value.Replace("\"", "");
+                Enum.TryParse<System.IO.Ports.Parity>(_parity, out System.IO.Ports.Parity parity);
+                this.parity = parity;
+
 
                 Console.WriteLine("{0}", config.DataModel);
 
@@ -57,9 +93,9 @@ namespace ModbusRTU_Viewer
                             config.DataModel.Name,
                             config.DataModel.Address,
                             type,
-                            (int) config.DataModel.count_of_Addresses,
+                            (int)config.DataModel.count_of_Addresses,
                             dataType,
-                            (int) config.DataModel.Length
+                            (int)config.DataModel.Length
                             );
                         break;
                     default:
@@ -67,14 +103,14 @@ namespace ModbusRTU_Viewer
                             config.DataModel.Name.Value,
                             config.DataModel.Address.Value,
                             type,
-                            (int) config.DataModel.count_of_Addresses.Value,
+                            (int)config.DataModel.count_of_Addresses.Value,
                             dataType,
                             config.DataModel.Unit.Value
                             );
                         break;
                 }
             }
-            
+
         }
 
     }
