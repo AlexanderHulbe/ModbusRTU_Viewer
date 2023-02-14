@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace ModbusRTU_Viewer
 {
@@ -19,6 +21,9 @@ namespace ModbusRTU_Viewer
         public System.IO.Ports.StopBits stopBits;
         public int Baudrate;
         public System.IO.Ports.Parity parity;
+
+        List<DisplayRow> rows = new List<DisplayRow>();
+        
 
         public Informations(string path)
         {
@@ -43,7 +48,7 @@ namespace ModbusRTU_Viewer
                     var head = item.Replace("\"", "");
                     headers.Add(head);
                     GridViewColumn col = new GridViewColumn();
-                    col.Width = App.Current.MainWindow.Width / len_headers;
+                    col.Width = App.Current.MainWindow.Width / len_headers - 10;
                     col.Header = head;
                     View.Columns.Add(col);
                 }
@@ -90,27 +95,73 @@ namespace ModbusRTU_Viewer
                 {
                     case DataModel.DataType.String:
                         dataModel = new DataModel(
-                            config.DataModel.Name,
-                            config.DataModel.Address,
-                            type,
-                            (int)config.DataModel.count_of_Addresses,
-                            dataType,
-                            (int)config.DataModel.Length
-                            );
-                        break;
-                    default:
-                        dataModel = new DataModel(
                             config.DataModel.Name.Value,
                             config.DataModel.Address.Value,
                             type,
                             (int)config.DataModel.count_of_Addresses.Value,
                             dataType,
-                            config.DataModel.Unit.Value
+                            (int)config.DataModel.Length
                             );
+                        break;
+                    default:
+
+                        if (config.DataModel["Format"] != null)
+                        {
+                            dataModel = new DataModel(
+                                config.DataModel.Name.Value,
+                                config.DataModel.Address.Value,
+                                type,
+                                (int)config.DataModel.count_of_Addresses.Value,
+                                dataType,
+                                config.DataModel.Format.Value
+                                );
+                            for (int i = 0; i < View.Columns.Count; i++)
+                            {
+                                View.Columns[i].DisplayMemberBinding = new Binding(DisplayRow.getAttributes()[i]);
+                            }
+
+                        }
+                        else
+                        {
+                            dataModel = new DataModel(
+                                config.DataModel.Name.Value,
+                                config.DataModel.Address.Value,
+                                type,
+                                (int)config.DataModel.count_of_Addresses.Value,
+                                dataType,
+                                new Unit(config.DataModel.Unit.Value)
+                                );
+                            for (int i = 0; i < View.Columns.Count; i++)
+                            {
+                                View.Columns[i].DisplayMemberBinding = new Binding(DisplayRow.getAttributes()[i]);
+                            }
+                        }
                         break;
                 }
             }
 
+        }
+
+        public bool HasProperty( object obj, string propertyName)
+        {
+            Type t = obj.GetType();
+            PropertyInfo p = t.GetProperty(propertyName);
+            if (p == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public bool addRow(DisplayRow row)
+        {
+            rows.Add(row);
+            ListView.ItemsSource = rows;
+
+            return false;
         }
 
     }

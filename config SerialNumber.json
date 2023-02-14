@@ -5,19 +5,18 @@
 		"Register",
 		"Wert",
 		"Name",
-		"Messwert",
-		"Einheit"
+		"SerienNummer"
 	],
 	"Slaves_Count": 1,
 	"Parity": "None",
 	"StopBits": 1,
 	"Baudrate": 9600,
 	"DataModel": {
-		"Name": "Force Integer",
-		"Address": "40052",
+		"Name": "SerialNumber",
+		"Address": "40012",
 		"Type": "HoldingRegister",
 		"count_of_Addresses": 2,
 		"DataType": "uint32",
-		"Unit": "kN"
+		"Format": "DD.MM.YY.XXXX"
 	}
 }

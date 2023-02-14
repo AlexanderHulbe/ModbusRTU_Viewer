@@ -9,6 +9,7 @@
         Height="600" 
         Width="900"
         ResizeMode="NoResize"
+        FocusManager.FocusedElement="{x:Reference DataField}"
         >
     <Grid
         Background="#F5F5F5"
@@ -75,20 +76,23 @@
         <!-- COL 3 -->
         <Label 
             Grid.Column="2" 
-            Content="Sensorbaudrate " 
+            Content="COM Port " 
             HorizontalAlignment="Left" 
             Margin="15,0,0,0" 
             VerticalAlignment="Center"
             Width="129" FontSize="16" Height="32"
             />
         <ComboBox
-            x:Name="DD_Baudraten"
+            x:Name="DD_ComPorts"
             Grid.Column="2" 
             HorizontalAlignment="Left" 
             Margin="153,0,0,0" 
             VerticalAlignment="Center" 
             Width="120"
-            Background="Transparent" Height="22" SelectionChanged="DD_Baudraten_SelectionChanged"
+            Background="Transparent" 
+            Height="22" 
+            ItemsSource="{Binding Path=ComPorts}"
+            SelectionChanged="DD_ComPorts_SelectionChanged"
             />
 
         <!-- COL 4 -->
@@ -133,7 +137,8 @@
             Grid.ColumnSpan="4"
             Grid.Row="2"
             IsUndoEnabled="False" 
-            IsReadOnly="True"/>
+            IsReadOnly="True"
+            />
 
 
 

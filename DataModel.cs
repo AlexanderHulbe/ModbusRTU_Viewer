@@ -31,22 +31,32 @@ namespace ModbusRTU_Viewer
         public Type type { get; set; }
         public int Count_of_Addresses { get; set; }
         public DataType dataType { get; set; }
-        public string Unit { get; set; }
+        public Unit Unit { get; set; }
         public int Length_of_DataTypeString { get; set; }
-        
+        public String format { get; set; }
+        public List<String> Value { get; set; }
+
 
 
 
         public DataModel(string name, string address, Type type, int Count_of_Addresses, DataType dataType) {
             Name = name;
-            Address = address;
+            Address = address.TrimStart(trimChars: '4');
             this.type = type;
             this.Count_of_Addresses = Count_of_Addresses;
             this.dataType = dataType;
         }
-        public DataModel(string name, string address, Type type, int Count_of_Addresses, DataType dataType, string Unit) {
+        public DataModel(string name, string address, Type type, int Count_of_Addresses, DataType dataType, string Format) {
             Name = name;
-            Address = address;
+            Address = address.TrimStart(trimChars: '4');
+            this.type = type;
+            this.Count_of_Addresses = Count_of_Addresses;
+            this.dataType = dataType;
+            this.format = Format;
+        }
+        public DataModel(string name, string address, Type type, int Count_of_Addresses, DataType dataType, Unit Unit) {
+            Name = name;
+            Address = address.TrimStart(trimChars: '4');
             this.type = type;
             this.Count_of_Addresses = Count_of_Addresses;
             this.dataType = dataType;
@@ -54,7 +64,7 @@ namespace ModbusRTU_Viewer
         }
         public DataModel(string name, string address, Type type, int Count_of_Addresses, DataType dataType, int Length_of_DataTypeString) {
             Name = name;
-            Address = address;
+            Address = address.TrimStart(trimChars: '4');
             this.type = type;
             this.Count_of_Addresses = Count_of_Addresses;
             this.dataType = dataType;

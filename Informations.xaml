@@ -10,7 +10,8 @@
 
     <Grid>
         <ListView 
-            d:ItemsSource="{d:SampleData ItemCount=5}"
+            x:Name="ListView"
+            ScrollViewer.CanContentScroll="False"
             >
             <ListView.View>
                 <GridView
