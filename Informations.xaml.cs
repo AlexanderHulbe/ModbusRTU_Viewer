@@ -102,6 +102,7 @@ namespace ModbusRTU_Viewer
                             dataType,
                             (int)config.DataModel.Length
                             );
+                        dataModel.RegisterType = config.DataModel.Type.Value.ToLower();
                         break;
                     default:
 
@@ -115,6 +116,7 @@ namespace ModbusRTU_Viewer
                                 dataType,
                                 config.DataModel.Format.Value
                                 );
+                            dataModel.RegisterType = config.DataModel.Type.Value.ToLower();
                             for (int i = 0; i < View.Columns.Count; i++)
                             {
                                 View.Columns[i].DisplayMemberBinding = new Binding(DisplayRow.getAttributes()[i]);
@@ -131,6 +133,7 @@ namespace ModbusRTU_Viewer
                                 dataType,
                                 new Unit(config.DataModel.Unit.Value)
                                 );
+                            dataModel.RegisterType = config.DataModel.Type.Value.ToLower();
                             for (int i = 0; i < View.Columns.Count; i++)
                             {
                                 View.Columns[i].DisplayMemberBinding = new Binding(DisplayRow.getAttributes()[i]);

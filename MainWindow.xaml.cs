@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Documents;
 
@@ -33,13 +34,23 @@ namespace ModbusRTU_Viewer
         bool firstConfigLoad = true;
         bool isConfigLoaded = false;
         String port;
+        bool WrongPort = true;
 
         public MainWindow()
         {
+            setup();
             ComPorts = GetComPorts();
             InitializeComponent();
             //DD_Baudraten.ItemsSource = Baudraten;
             DD_ComPorts.ItemsSource = ComPorts;
+        }
+
+        private void setup()
+        {
+            if (!Directory.Exists(App.pathString))
+            {
+                Directory.CreateDirectory(App.pathString);
+            }
         }
 
         private List<String> GetComPorts()
@@ -58,9 +69,8 @@ namespace ModbusRTU_Viewer
             return new List<string>(ports);
         }
 
-        private void btn_loadConfig_Click(object sender, RoutedEventArgs e)
+        private void resetClients()
         {
-
             if (!firstConfigLoad)
             {
                 foreach (var client in clients)
@@ -75,9 +85,21 @@ namespace ModbusRTU_Viewer
                         throw;
                     }
                 }
+                clients = new List<ModbusClient>();
             }
+        }
+
+        private void btn_loadConfig_Click(object sender, RoutedEventArgs e)
+        {
+
+            resetClients();
 
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            //openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            openFileDialog.InitialDirectory = App.pathString;
+            openFileDialog.Multiselect = false;
+            openFileDialog.Title = "Config Datei auswählen";
+            openFileDialog.Filter = "Json files (*.json)|*.json|Text files (*.txt)|*.txt";
             if (openFileDialog.ShowDialog() == true)
             {
                 if (openFileDialog.FileName != null)
@@ -111,83 +133,178 @@ namespace ModbusRTU_Viewer
         {
             for (int i = Int32.Parse(slave_addr_start.Text); i <= info.slaves; i++)
             {
+                var alreadyCon = false;
+
                 ModbusClient modbusClient = new ModbusClient(port);
                 modbusClient.UnitIdentifier = (byte) i;
                 modbusClient.Baudrate = info.Baudrate;
                 modbusClient.Parity = info.parity;
                 modbusClient.StopBits = info.stopBits;
-                modbusClient.Connect();
-                clients.Add(modbusClient);
+
+                foreach (var client in clients)
+                {
+                    if (client.Connected && client.SerialPort.ToString() == port)
+                    {
+                        alreadyCon = true;
+                        break;
+                    }
+                }
+                
+                if (!alreadyCon)
+                {
+                    try
+                    {
+                        modbusClient.Connect();
+                        if (isAlive(modbusClient))
+                        {
+                            clients.Add(modbusClient);
+                            WrongPort = false;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        addLineToDataField(e.Message);
+                        //throw;
+                    }
+                }
+                else
+                {
+                    addLineToDataField("Slave "+modbusClient.UnitIdentifier + " is already Connected!");
+                    WrongPort = false;
+                }
             }
+        }
+
+        private bool isAlive(ModbusClient client)
+        {
+
+            for (int i = 0; i < 130; i++)
+            {
+                try
+                {
+                    var temp = client.ReadHoldingRegisters(0 + i, 1)[0];
+                    return true;
+                }
+                catch (Exception)
+                {
+                    //throw;
+                }
+                try
+                {
+                    var temp = client.ReadInputRegisters(0 + i, 1)[0].ToString("X4");
+                    return true;
+                }
+                catch (Exception)
+                {
+                    //throw;
+                }
+                
+            }
+
+            return false;
         }
 
         private void readData()
         {
-            int addr = Int32.Parse(info.dataModel.Address);
-            int count = info.dataModel.Count_of_Addresses;
-
-            string registers = "";
-
-            for (int i = 0; i < count; i++)
+            if (!WrongPort)
             {
-                registers += (addr + i).ToString() + " + ";
-            }
-            registers = registers.TrimEnd(' ');
-            registers = registers.TrimEnd('+');
-            registers = registers.TrimEnd(' ');
-            foreach (var client in clients)
-            {
-                List<String> data = new List<String>();
-                
+                int addr = Int32.Parse(info.dataModel.Address);
+                int count = info.dataModel.Count_of_Addresses;
+
+                string registers = "";
+
                 for (int i = 0; i < count; i++)
                 {
-                    var hex = client.ReadHoldingRegisters(addr + i, 1)[0].ToString("X4");
-                    while (hex.Length > 4)
+                    registers += (addr + i).ToString() + " + ";
+                }
+                registers = registers.TrimEnd(' ').TrimEnd('+').TrimEnd(' ');
+                foreach (var client in clients)
+                {
+                    List<String> data = new List<String>();
+
+                    for (int i = 0; i < count; i++)
                     {
-                        hex = hex.Substring(1);
+                        dynamic hex = "";
+                        switch (info.dataModel.RegisterType)
+                        {
+                            case "holdingregister":
+                                var _hex = client.ReadHoldingRegisters(addr + i, 1)[0];
+                                hex = _hex.ToString("X4");
+                                break;
+                            case "inputregister":
+                                hex = client.ReadInputRegisters(addr + i, 1)[0].ToString("X4");
+                                break;
+
+                            default:
+                                Console.WriteLine("Default in convert Function!");
+                                addLineToDataField("Default in convert Function!");
+                                break;
+                        }
+                        while (hex.Length > 4)
+                        {
+                            hex = hex.Substring(1);
+                        }
+                        if (!String.IsNullOrEmpty(hex))
+                        {
+
+                            Console.WriteLine("Addr: " + (addr + i) + " => " + hex);
+                            addLineToDataField("Slave " + client.UnitIdentifier + " Addr: " + (addr + i) + " => " + hex);
+                            data.Add(hex);
+                        }
                     }
-                    if (!String.IsNullOrEmpty(hex))
+                    String val = "";
+                    foreach (var item in data)
                     {
-
-                        Console.WriteLine("Addr: " + (addr + i) + " => " + hex);
-                        addLineToDataField("Slave " + client.UnitIdentifier + " Addr: " + (addr + i) + " => " + hex);
-                        data.Add(hex);
+                        val += item;
                     }
+
+                    dynamic decVal = null;
+
+                    if (info.dataModel.format != null)
+                    {
+                        decVal = convert(val, info.dataModel.dataType, info.dataModel.format);
+                    }
+                    else
+                    {
+                        decVal = convert(val, info.dataModel.dataType);
+                    }
+
+                    DisplayRow row = null;
+
+                    if (info.dataModel.Unit != null)
+                    {
+                        row = new DisplayRow(
+                            client.UnitIdentifier.ToString(),
+                            info.dataModel.Name,
+                            registers,
+                            decVal,
+                            val,
+                            new Unit(info.dataModel.Unit.Name)
+                            );
+                    }
+                    else
+                    {
+                        row = new DisplayRow(
+                            client.UnitIdentifier.ToString(),
+                            info.dataModel.Name,
+                            registers,
+                            decVal,
+                            val
+                            );
+                    }
+
+                    info.addRow(row);
+
+
+                    Console.WriteLine("Wert in HEX: " + val);
+                    addLineToDataField("Wert in HEX: " + val);
+                    Console.WriteLine("Wert in DEC: " + decVal);
+                    addLineToDataField("Wert in DEC: " + decVal);
                 }
-                String val = "";
-                foreach (var item in data)
-                {
-                    val += item;
-                }
-
-                dynamic decVal = null;
-
-                if (info.dataModel.format != null)
-                {
-                    decVal = convert(val, info.dataModel.dataType,info.dataModel.format);
-                }
-                else
-                {
-                    decVal = convert(val,info.dataModel.dataType);
-                }
-
-                
-
-                DisplayRow row = new DisplayRow(
-                    client.UnitIdentifier.ToString(),
-                    info.dataModel.Name,
-                    registers,
-                    decVal,
-                    val
-                    );
-
-                info.addRow(row);
-                
-
-                Console.WriteLine("Wert in HEX: " + val);
-                addLineToDataField("Wert in HEX: " + val);
-                Console.WriteLine("Wert in DEC: " + decVal);
-                addLineToDataField("Wert in DEC: " + decVal);
+            }
+            else
+            {
+                addLineToDataField("Kein Modbus Gerät an Port: "+port);
             }
         }
 
@@ -198,7 +315,7 @@ namespace ModbusRTU_Viewer
             {
                 case DataModel.DataType.uint32:
 
-                    response = UInt32.Parse(val, System.Globalization.NumberStyles.HexNumber);
+                    response = UInt32.Parse(val, System.Globalization.NumberStyles.HexNumber)+"";
                     break;
 
                 default:
@@ -223,12 +340,17 @@ namespace ModbusRTU_Viewer
                     break;
             }
             int pos = 0;
+            var len = Format.Length;
             while (Format.IndexOf('.') > 0)
             {
                 pos += Format.IndexOf('.');
                 response = response.ToString().Insert(pos, ".");
                 pos += 1;
                 Format = Format.Substring(Format.IndexOf('.')+1);
+            }
+            while (response.Length > len)
+            {
+                response = response.Substring(0, response.Length - 1);
             }
 
             return response;
@@ -247,9 +369,11 @@ namespace ModbusRTU_Viewer
         {
             port = DD_ComPorts.SelectedItem.ToString();
             addLineToDataField("COM Port ausgewählt: "+port);
+            WrongPort = true;
             if (isConfigLoaded)
             {
                 firstConfigLoad = false;
+                resetClients();
                 connectToClients(port);
                 readData(); 
             }

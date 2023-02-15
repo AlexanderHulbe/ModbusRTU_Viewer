@@ -35,6 +35,7 @@ namespace ModbusRTU_Viewer
         public int Length_of_DataTypeString { get; set; }
         public String format { get; set; }
         public List<String> Value { get; set; }
+        public String RegisterType { get; set; }
 
 
 

@@ -8,7 +8,7 @@ namespace ModbusRTU_Viewer
 
         public Unit(String Unit)
         {
-            this.Name = Name;
+            this.Name = Unit;
         }
 
     }
