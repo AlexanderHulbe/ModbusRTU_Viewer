@@ -110,7 +110,8 @@ namespace ModbusRTU_Viewer
                     //DD_Baudraten.SelectedValue = info.Baudrate;
 
 
-                    addLineToDataField(info.config);
+                    //addLineToDataField(info.config);
+                    addLineToDataField("New Config Loaded",true);
                     isConfigLoaded = true;
 
                     if (!String.IsNullOrEmpty(port))
@@ -296,10 +297,10 @@ namespace ModbusRTU_Viewer
                     info.addRow(row);
 
 
-                    Console.WriteLine("Wert in HEX: " + val);
-                    addLineToDataField("Wert in HEX: " + val);
-                    Console.WriteLine("Wert in DEC: " + decVal);
-                    addLineToDataField("Wert in DEC: " + decVal);
+                    Console.WriteLine("Slave " + client.UnitIdentifier + " Wert in HEX: " + val);
+                    addLineToDataField("Slave " + client.UnitIdentifier + " Wert in HEX: " + val);
+                    Console.WriteLine("Slave " + client.UnitIdentifier + " Wert in DEC: " + decVal);
+                    addLineToDataField("Slave " + client.UnitIdentifier + " Wert: " + decVal);
                 }
             }
             else
@@ -363,6 +364,19 @@ namespace ModbusRTU_Viewer
             timestamp += data;
             Console.WriteLine(timestamp);
             DataField.AppendText("\n"+timestamp);
+            DataField.ScrollToEnd();
+        }
+        private void addLineToDataField(dynamic data,bool newLine)
+        {
+            string timestamp = "";
+            if (newLine)
+                timestamp = "\n";
+            timestamp += "[" + DateTime.Now.ToString() + "]: ";
+            Console.WriteLine(timestamp);
+            timestamp += data;
+            Console.WriteLine(timestamp);
+            DataField.AppendText("\n" + timestamp);
+            DataField.ScrollToEnd();
         }
 
         private void DD_ComPorts_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
