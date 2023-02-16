@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Threading;
 
 namespace ModbusRTU_Viewer
 {
@@ -35,6 +36,8 @@ namespace ModbusRTU_Viewer
         bool isConfigLoaded = false;
         String port;
         bool WrongPort = true;
+        DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+
 
         public MainWindow()
         {
@@ -43,6 +46,7 @@ namespace ModbusRTU_Viewer
             InitializeComponent();
             //DD_Baudraten.ItemsSource = Baudraten;
             DD_ComPorts.ItemsSource = ComPorts;
+            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
         }
 
         private void setup()
@@ -73,6 +77,7 @@ namespace ModbusRTU_Viewer
         {
             if (!firstConfigLoad)
             {
+                dispatcherTimer.Stop();
                 foreach (var client in clients)
                 {
                     try
@@ -117,7 +122,8 @@ namespace ModbusRTU_Viewer
                     if (!String.IsNullOrEmpty(port))
                     {
                         connectToClients(port);
-                        readData();
+                        //readData();
+                        SetupTimer();
                         firstConfigLoad = false;
                     }
 
@@ -132,48 +138,46 @@ namespace ModbusRTU_Viewer
 
         private void connectToClients(dynamic port)
         {
-            for (int i = Int32.Parse(slave_addr_start.Text); i <= info.slaves; i++)
+            var alreadyCon = false;
+
+            ModbusClient modbusClient = new ModbusClient(port);
+            modbusClient.UnitIdentifier = (byte) Int32.Parse(slave_addr_start.Text);
+            modbusClient.Baudrate = info.Baudrate;
+            modbusClient.Parity = info.parity;
+            modbusClient.StopBits = info.stopBits;
+
+            foreach (var client in clients)
             {
-                var alreadyCon = false;
-
-                ModbusClient modbusClient = new ModbusClient(port);
-                modbusClient.UnitIdentifier = (byte) i;
-                modbusClient.Baudrate = info.Baudrate;
-                modbusClient.Parity = info.parity;
-                modbusClient.StopBits = info.stopBits;
-
-                foreach (var client in clients)
+                if (client.Connected && client.SerialPort.ToString() == port)
                 {
-                    if (client.Connected && client.SerialPort.ToString() == port)
-                    {
-                        alreadyCon = true;
-                        break;
-                    }
-                }
-                
-                if (!alreadyCon)
-                {
-                    try
-                    {
-                        modbusClient.Connect();
-                        if (isAlive(modbusClient))
-                        {
-                            clients.Add(modbusClient);
-                            WrongPort = false;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        addLineToDataField(e.Message);
-                        //throw;
-                    }
-                }
-                else
-                {
-                    addLineToDataField("Slave "+modbusClient.UnitIdentifier + " is already Connected!");
-                    WrongPort = false;
+                    alreadyCon = true;
+                    break;
                 }
             }
+
+            if (!alreadyCon)
+            {
+                try
+                {
+                    modbusClient.Connect();
+                    if (isAlive(modbusClient))
+                    {
+                        clients.Add(modbusClient);
+                        WrongPort = false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    addLineToDataField(e.Message);
+                    //throw;
+                }
+            }
+            else
+            {
+                clients.Add(modbusClient);
+                addLineToDataField("Slave " + modbusClient.UnitIdentifier + " is already Connected!");
+                WrongPort = false;
+            } 
         }
 
         private bool isAlive(ModbusClient client)
@@ -219,9 +223,10 @@ namespace ModbusRTU_Viewer
                     registers += (addr + i).ToString() + " + ";
                 }
                 registers = registers.TrimEnd(' ').TrimEnd('+').TrimEnd(' ');
-                foreach (var client in clients)
+                for (int slave = Int32.Parse(slave_addr_start.Text); slave <= info.slaves; slave++)
                 {
                     List<String> data = new List<String>();
+                    clients[0].UnitIdentifier = (byte) slave;
 
                     for (int i = 0; i < count; i++)
                     {
@@ -229,11 +234,11 @@ namespace ModbusRTU_Viewer
                         switch (info.dataModel.RegisterType)
                         {
                             case "holdingregister":
-                                var _hex = client.ReadHoldingRegisters(addr + i, 1)[0];
+                                var _hex = clients[0].ReadHoldingRegisters(addr + i, 1)[0];
                                 hex = _hex.ToString("X4");
                                 break;
                             case "inputregister":
-                                hex = client.ReadInputRegisters(addr + i, 1)[0].ToString("X4");
+                                hex = clients[0].ReadInputRegisters(addr + i, 1)[0].ToString("X4");
                                 break;
 
                             default:
@@ -249,7 +254,7 @@ namespace ModbusRTU_Viewer
                         {
 
                             Console.WriteLine("Addr: " + (addr + i) + " => " + hex);
-                            addLineToDataField("Slave " + client.UnitIdentifier + " Addr: " + (addr + i) + " => " + hex);
+                            addLineToDataField("Slave " + clients[0].UnitIdentifier + " Addr: " + (addr + i) + " => " + hex);
                             data.Add(hex);
                         }
                     }
@@ -275,7 +280,7 @@ namespace ModbusRTU_Viewer
                     if (info.dataModel.Unit != null)
                     {
                         row = new DisplayRow(
-                            client.UnitIdentifier.ToString(),
+                            clients[0].UnitIdentifier.ToString(),
                             info.dataModel.Name,
                             registers,
                             decVal,
@@ -286,7 +291,7 @@ namespace ModbusRTU_Viewer
                     else
                     {
                         row = new DisplayRow(
-                            client.UnitIdentifier.ToString(),
+                            clients[0].UnitIdentifier.ToString(),
                             info.dataModel.Name,
                             registers,
                             decVal,
@@ -297,10 +302,10 @@ namespace ModbusRTU_Viewer
                     info.addRow(row);
 
 
-                    Console.WriteLine("Slave " + client.UnitIdentifier + " Wert in HEX: " + val);
-                    addLineToDataField("Slave " + client.UnitIdentifier + " Wert in HEX: " + val);
-                    Console.WriteLine("Slave " + client.UnitIdentifier + " Wert in DEC: " + decVal);
-                    addLineToDataField("Slave " + client.UnitIdentifier + " Wert: " + decVal);
+                    Console.WriteLine("Slave " + clients[0].UnitIdentifier + " Wert in HEX: " + val);
+                    addLineToDataField("Slave " + clients[0].UnitIdentifier + " Wert in HEX: " + val);
+                    Console.WriteLine("Slave " + clients[0].UnitIdentifier + " Wert in DEC: " + decVal);
+                    addLineToDataField("Slave " + clients[0].UnitIdentifier + " Wert: " + decVal);
                 }
             }
             else
@@ -309,6 +314,21 @@ namespace ModbusRTU_Viewer
             }
         }
 
+        private void SetupTimer()
+        {
+            //  DispatcherTimer setup
+            dispatcherTimer.Stop();
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0,0, int.Parse(scan_rate.Text)); //Intervall aus Textbox
+            dispatcherTimer.Start();
+        }
+
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            if (isConfigLoaded && !String.IsNullOrEmpty(port))
+            {
+                readData();
+            }
+        }
         private dynamic convert(string val, DataModel.DataType datatype)
         {
             dynamic response = null;
@@ -389,8 +409,16 @@ namespace ModbusRTU_Viewer
                 firstConfigLoad = false;
                 resetClients();
                 connectToClients(port);
-                readData(); 
+                //readData(); 
+                SetupTimer();
             }
+        }
+
+        private void scan_rate_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            dispatcherTimer.Stop();
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, int.Parse(scan_rate.Text));
+            dispatcherTimer.Start();
         }
     }
 }

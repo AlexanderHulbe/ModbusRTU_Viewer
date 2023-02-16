@@ -70,7 +70,8 @@
             Text="1000" 
             FontSize="16"
             VerticalAlignment="Center" 
-            Width="60"/>
+            Width="60"
+            TextChanged="scan_rate_TextChanged"/>
 
 
         <!-- COL 3 -->
@@ -116,7 +117,8 @@
             FontSize="16"
             VerticalAlignment="Center" 
             Height="20"
-            Width="94" MaxLines="2147483646"
+            Width="94"
+            MaxLines="2147483646"
             />
 
 

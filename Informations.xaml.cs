@@ -163,8 +163,25 @@ namespace ModbusRTU_Viewer
 
         public bool addRow(DisplayRow row)
         {
+
+            foreach (var item in rows)
+            {
+                if (row.SlaveAddress == item.SlaveAddress)
+                {
+                    item.RawValue = row.RawValue;
+                    item.Value = row.Value;
+                    item.Registers = row.Registers;
+                    item.Name = row.Name;
+                    item.Unit = row.Unit;
+                    ListView.ItemsSource = rows;
+                    ListView.Items.Refresh();
+                    return false;
+                }
+            }
+
             rows.Add(row);
             ListView.ItemsSource = rows;
+            ListView.Items.Refresh();
 
             return false;
         }

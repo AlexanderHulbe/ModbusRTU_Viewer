@@ -115,6 +115,7 @@
     <None Include="Sample config\config Force Integer.json" />
     <None Include="Sample config\config Last Calibration Date.json" />
     <None Include="Sample config\config Next Calibration Date.json" />
+    <None Include="Sample config\config SerialNumber 2 Slaves.json" />
     <None Include="Sample config\config SerialNumber.json" />
   </ItemGroup>
   <ItemGroup>
