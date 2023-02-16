@@ -112,6 +112,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Sample config\config ADC RAW Value.json" />
+    <None Include="Sample config\config Force Integer 3 Slaves.json" />
     <None Include="Sample config\config Force Integer.json" />
     <None Include="Sample config\config Last Calibration Date.json" />
     <None Include="Sample config\config Next Calibration Date.json" />

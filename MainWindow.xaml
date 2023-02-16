@@ -140,7 +140,9 @@
             Grid.Row="2"
             IsUndoEnabled="False" 
             IsReadOnly="True"
-            />
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+        />
 
 
 

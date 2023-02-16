@@ -17,15 +17,20 @@ namespace ModbusRTU_Viewer
 
         List<int> Baudraten = new List<int>()
                     {
-                        4800,
                         9600,
                         19200,
                         38400,
                         57600,
                         115200,
-                        128000,
-                        250000,
-                        256000
+                        460800
+                    };
+        List<string> Units = new List<string>()
+                    {
+                        "N",
+                        "dN",
+                        "kN",
+                        "MN",
+                        "GN"
                     };
 
         public List<String> ComPorts;
@@ -168,14 +173,14 @@ namespace ModbusRTU_Viewer
                 }
                 catch (Exception e)
                 {
-                    addLineToDataField(e.Message);
+                    output(e.Message);
                     //throw;
                 }
             }
             else
             {
                 clients.Add(modbusClient);
-                addLineToDataField("Slave " + modbusClient.UnitIdentifier + " is already Connected!");
+                output("Slave " + modbusClient.UnitIdentifier + " is already Connected!");
                 WrongPort = false;
             } 
         }
@@ -220,9 +225,9 @@ namespace ModbusRTU_Viewer
 
                 for (int i = 0; i < count; i++)
                 {
-                    registers += (addr + i).ToString() + " + ";
+                    registers += (40000+addr + i).ToString() + " & ";
                 }
-                registers = registers.TrimEnd(' ').TrimEnd('+').TrimEnd(' ');
+                registers = registers.TrimEnd(' ').TrimEnd('&').TrimEnd(' ');
                 for (int slave = Int32.Parse(slave_addr_start.Text); slave <= info.slaves; slave++)
                 {
                     List<String> data = new List<String>();
@@ -234,16 +239,43 @@ namespace ModbusRTU_Viewer
                         switch (info.dataModel.RegisterType)
                         {
                             case "holdingregister":
-                                var _hex = clients[0].ReadHoldingRegisters(addr + i, 1)[0];
-                                hex = _hex.ToString("X4");
+                                dynamic _hex;
+                                try
+                                {
+                                    _hex = clients[0].ReadHoldingRegisters(addr + i, 1)[0];
+                                    hex = _hex.ToString("X4");
+                                }
+                                catch (Exception)
+                                {
+                                    output("Connection TimeOut!");
+                                    dispatcherTimer.Stop();
+                                    InitializeComponent();
+                                    throw;
+                                }
                                 break;
                             case "inputregister":
-                                hex = clients[0].ReadInputRegisters(addr + i, 1)[0].ToString("X4");
+                                try
+                                {
+                                    var _addr = UInt32.Parse(addr+"", System.Globalization.NumberStyles.HexNumber);
+
+                                    var __addr = int.Parse(_addr+"");
+
+                                    var temp = clients[0].ReadInputRegisters(__addr + i, 1);
+                                    var _temp = temp[0];
+                                    hex = _temp.ToString("X4");
+                                    //hex = clients[0].ReadInputRegisters(addr + i, 1)[0].ToString("X4");
+                                }
+                                catch (Exception)
+                                {
+                                    output("Connection TimeOut!");
+                                    dispatcherTimer.Stop();
+                                    InitializeComponent();
+                                    throw;
+                                }
                                 break;
 
                             default:
-                                Console.WriteLine("Default in convert Function!");
-                                addLineToDataField("Default in convert Function!");
+                                output("Default in convert Function!");
                                 break;
                         }
                         while (hex.Length > 4)
@@ -252,16 +284,16 @@ namespace ModbusRTU_Viewer
                         }
                         if (!String.IsNullOrEmpty(hex))
                         {
-
-                            Console.WriteLine("Addr: " + (addr + i) + " => " + hex);
-                            addLineToDataField("Slave " + clients[0].UnitIdentifier + " Addr: " + (addr + i) + " => " + hex);
+                            output("Slave " + clients[0].UnitIdentifier + " Addr: " + (addr + i) + " => " + hex);
                             data.Add(hex);
                         }
                     }
                     String val = "";
+                    String disval = "";
                     foreach (var item in data)
                     {
                         val += item;
+                        disval += item + " ";
                     }
 
                     dynamic decVal = null;
@@ -284,7 +316,7 @@ namespace ModbusRTU_Viewer
                             info.dataModel.Name,
                             registers,
                             decVal,
-                            val,
+                            disval,
                             new Unit(info.dataModel.Unit.Name)
                             );
                     }
@@ -295,22 +327,20 @@ namespace ModbusRTU_Viewer
                             info.dataModel.Name,
                             registers,
                             decVal,
-                            val
+                            disval
                             );
                     }
 
                     info.addRow(row);
 
 
-                    Console.WriteLine("Slave " + clients[0].UnitIdentifier + " Wert in HEX: " + val);
-                    addLineToDataField("Slave " + clients[0].UnitIdentifier + " Wert in HEX: " + val);
-                    Console.WriteLine("Slave " + clients[0].UnitIdentifier + " Wert in DEC: " + decVal);
-                    addLineToDataField("Slave " + clients[0].UnitIdentifier + " Wert: " + decVal);
+                    //output("Slave " + clients[0].UnitIdentifier + " Wert in HEX: " + val);
+                    output("Slave " + clients[0].UnitIdentifier + " Wert: " + decVal);
                 }
             }
             else
             {
-                addLineToDataField("Kein Modbus Gerät an Port: "+port);
+                output("Kein Modbus Gerät an Port: "+port);
             }
         }
 
@@ -332,15 +362,51 @@ namespace ModbusRTU_Viewer
         private dynamic convert(string val, DataModel.DataType datatype)
         {
             dynamic response = null;
-            switch (datatype)
+            switch(info.config.Name.Value.ToLower())
             {
-                case DataModel.DataType.uint32:
+                case "bauer kraftmessdose":
+                    switch (datatype)
+                    {
+                        case DataModel.DataType.uint32:
 
-                    response = UInt32.Parse(val, System.Globalization.NumberStyles.HexNumber)+"";
+                            switch (info.dataModel.Name.ToLower())
+                            {
+                                case "unit":
+                                    val = val.TrimEnd('0').TrimStart('0');
+                                    response = Units[int.Parse(val) - 1];
+                                    break;
+                                case "baudrate":
+                                    val = val.TrimEnd('0').TrimStart('0');
+                                    response = ""+Baudraten[int.Parse(val)-1];
+                                    break;
+                                default:
+                                    response = UInt32.Parse(val, System.Globalization.NumberStyles.HexNumber) + "";
+                                    break;
+                            }
+                            break;
+
+                        default:
+                            Console.WriteLine("Default in convert Function!");
+                            break;
+                    }
                     break;
-
+                case "sisgeo tiltmeter":
+                    switch (info.dataModel.Name.ToLower())
+                    {
+                        default:
+                            response = UInt32.Parse(val, System.Globalization.NumberStyles.HexNumber) + "";
+                            break;
+                    }
+                    break;
+                case "sisgeo inklinometer":
+                    switch (info.dataModel.Name.ToLower())
+                    {
+                        default:
+                            response = UInt32.Parse(val, System.Globalization.NumberStyles.HexNumber) + "";
+                            break;
+                    }
                 default:
-                    Console.WriteLine("Default in convert Function!");
+                    output("Unbekannter Sensor in der Config angegeben!");
                     break;
             }
 
@@ -419,6 +485,12 @@ namespace ModbusRTU_Viewer
             dispatcherTimer.Stop();
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, int.Parse(scan_rate.Text));
             dispatcherTimer.Start();
+        }
+        
+        private void output(dynamic data)
+        {
+            addLineToDataField(data);
+            Console.WriteLine(data);
         }
     }
 }

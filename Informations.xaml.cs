@@ -168,13 +168,17 @@ namespace ModbusRTU_Viewer
             {
                 if (row.SlaveAddress == item.SlaveAddress)
                 {
-                    item.RawValue = row.RawValue;
-                    item.Value = row.Value;
-                    item.Registers = row.Registers;
-                    item.Name = row.Name;
-                    item.Unit = row.Unit;
-                    ListView.ItemsSource = rows;
-                    ListView.Items.Refresh();
+                    if (row.RawValue != item.RawValue)
+                    {
+                        item.RawValue = row.RawValue;
+                        item.Value = row.Value;
+                        item.Registers = row.Registers;
+                        item.Name = row.Name;
+                        item.Unit = row.Unit;
+                        ListView.ItemsSource = rows;
+                        ListView.Items.Refresh();
+                        return false;
+                    }
                     return false;
                 }
             }
