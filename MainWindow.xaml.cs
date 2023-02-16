@@ -405,6 +405,7 @@ namespace ModbusRTU_Viewer
                             response = UInt32.Parse(val, System.Globalization.NumberStyles.HexNumber) + "";
                             break;
                     }
+                    break;
                 default:
                     output("Unbekannter Sensor in der Config angegeben!");
                     break;
