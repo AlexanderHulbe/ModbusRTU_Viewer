@@ -32,7 +32,6 @@ namespace ModbusRTU_Viewer
                         "MN",
                         "GN"
                     };
-
         public List<String> ComPorts;
 
         Informations info;
@@ -43,7 +42,6 @@ namespace ModbusRTU_Viewer
         bool WrongPort = true;
         DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
 
-
         public MainWindow()
         {
             setup();
@@ -53,7 +51,6 @@ namespace ModbusRTU_Viewer
             DD_ComPorts.ItemsSource = ComPorts;
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
         }
-
         private void setup()
         {
             if (!Directory.Exists(App.pathString))
@@ -61,7 +58,6 @@ namespace ModbusRTU_Viewer
                 Directory.CreateDirectory(App.pathString);
             }
         }
-
         private List<String> GetComPorts()
         {
             // Get a list of serial port names.
@@ -77,7 +73,6 @@ namespace ModbusRTU_Viewer
 
             return new List<string>(ports);
         }
-
         private void resetClients()
         {
             if (!firstConfigLoad)
@@ -98,7 +93,6 @@ namespace ModbusRTU_Viewer
                 clients = new List<ModbusClient>();
             }
         }
-
         private void btn_loadConfig_Click(object sender, RoutedEventArgs e)
         {
 
@@ -140,7 +134,6 @@ namespace ModbusRTU_Viewer
                 DataField.Text += "\nUNVALID JSON CONFIG";
             }
         }
-
         private void connectToClients(dynamic port)
         {
             var alreadyCon = false;
@@ -184,7 +177,6 @@ namespace ModbusRTU_Viewer
                 WrongPort = false;
             } 
         }
-
         private bool isAlive(ModbusClient client)
         {
 
@@ -213,7 +205,6 @@ namespace ModbusRTU_Viewer
 
             return false;
         }
-
         private void readData()
         {
             if (!WrongPort)
@@ -343,7 +334,6 @@ namespace ModbusRTU_Viewer
                 output("Kein Modbus Gerät an Port: "+port);
             }
         }
-
         private void SetupTimer()
         {
             //  DispatcherTimer setup
@@ -351,7 +341,6 @@ namespace ModbusRTU_Viewer
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0,0, int.Parse(scan_rate.Text)); //Intervall aus Textbox
             dispatcherTimer.Start();
         }
-
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             if (isConfigLoaded && !String.IsNullOrEmpty(port))
@@ -372,8 +361,15 @@ namespace ModbusRTU_Viewer
                             switch (info.dataModel.Name.ToLower())
                             {
                                 case "unit":
-                                    val = val.TrimEnd('0').TrimStart('0');
-                                    response = Units[int.Parse(val) - 1];
+                                    if (val != "0" && val != "0000")
+                                    {
+                                        val = val.TrimEnd('0').TrimStart('0');
+                                        response = Units[int.Parse(val) - 1];
+                                    }
+                                    else
+                                    {
+                                        response = "unkown / none";
+                                    }
                                     break;
                                 case "baudrate":
                                     val = val.TrimEnd('0').TrimStart('0');
@@ -420,7 +416,7 @@ namespace ModbusRTU_Viewer
             {
                 case DataModel.DataType.uint32:
 
-                    response = UInt32.Parse(val, System.Globalization.NumberStyles.HexNumber);
+                    response = ""+UInt32.Parse(val, System.Globalization.NumberStyles.HexNumber);
                     break;
 
                 default:
@@ -429,21 +425,27 @@ namespace ModbusRTU_Viewer
             }
             int pos = 0;
             var len = Format.Length;
-            while (Format.IndexOf('.') > 0)
+            if (!String.IsNullOrEmpty(response) && response != "0")
             {
-                pos += Format.IndexOf('.');
-                response = response.ToString().Insert(pos, ".");
-                pos += 1;
-                Format = Format.Substring(Format.IndexOf('.')+1);
+                while (Format.IndexOf('.') > 0)
+                {
+                    pos += Format.IndexOf('.');
+                    response = response.ToString().Insert(pos, ".");
+                    pos += 1;
+                    Format = Format.Substring(Format.IndexOf('.') + 1);
+                }
+                while (response.Length > len)
+                {
+                    response = response.Substring(0, response.Length - 1);
+                }
             }
-            while (response.Length > len)
+            else
             {
-                response = response.Substring(0, response.Length - 1);
+                response = "unkown / none";
             }
-
+            
             return response;
         }
-
         private void addLineToDataField(dynamic data)
         {
             var timestamp = "[" + DateTime.Now.ToString() + "]: ";
@@ -465,7 +467,6 @@ namespace ModbusRTU_Viewer
             DataField.AppendText("\n" + timestamp);
             DataField.ScrollToEnd();
         }
-
         private void DD_ComPorts_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             port = DD_ComPorts.SelectedItem.ToString();
@@ -480,14 +481,12 @@ namespace ModbusRTU_Viewer
                 SetupTimer();
             }
         }
-
         private void scan_rate_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             dispatcherTimer.Stop();
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, int.Parse(scan_rate.Text));
             dispatcherTimer.Start();
         }
-        
         private void output(dynamic data)
         {
             addLineToDataField(data);

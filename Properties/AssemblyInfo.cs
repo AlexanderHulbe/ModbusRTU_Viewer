@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("BAUER AG")]
 [assembly: AssemblyProduct("ModbusRTU_Viewer")]
-[assembly: AssemblyCopyright("Copyright © BAUER AG 2023")]
+[assembly: AssemblyCopyright("Copyright © Alexander Hulbe")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
