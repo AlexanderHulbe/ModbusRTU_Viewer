@@ -13,9 +13,12 @@ namespace ModbusRTU_Viewer
 {
     /// <summary>
     /// Interaktionslogik für Informations.xaml
+    /// Author: Alexander Hulbe
     /// </summary>
     public partial class Informations : Page
     {
+
+        // Declare Variables
         public dynamic config = null;
         List<String> headers = new List<String>();
         public DataModel dataModel;
@@ -25,25 +28,27 @@ namespace ModbusRTU_Viewer
         public System.IO.Ports.Parity parity;
 
         List<DisplayRow> rows = new List<DisplayRow>();
-        
 
+        // Default Constructor for Information Object
         public Informations(string path)
         {
             InitializeComponent();
             LoadJson(path);
         }
 
+        // Load JSON Data
         public void LoadJson(string path)
         {
-
+            // Read JSON File
             using (StreamReader r = new StreamReader(path))
             {
+                // Load files into Variable
                 string json = r.ReadToEnd();
                 config = JsonConvert.DeserializeObject(json);
 
                 Console.WriteLine("{0}", config);
 
-
+                // Get Headers for Columns to Display Data
                 var len_headers = config.Headers.Count;
                 foreach (string item in config.Headers)
                 {
@@ -55,9 +60,11 @@ namespace ModbusRTU_Viewer
                     View.Columns.Add(col);
                 }
 
-
+                // Get Amount of Slaves
                 slaves = config.Slaves_Count;
+                // Get Baudrate from Config file
                 Baudrate = (int)config.Baudrate;
+                // Set correct StopBits
                 dynamic _stopBits = "";
                 switch ((double)config.StopBits.Value)
                 {
@@ -81,6 +88,7 @@ namespace ModbusRTU_Viewer
                 Enum.TryParse<System.IO.Ports.StopBits>(_stopBits, out System.IO.Ports.StopBits stopBits);
                 this.stopBits = stopBits;
                 
+                // Set correct Parity 
                 var _parity = config.Parity.Value.Replace("\"", "");
                 Enum.TryParse<System.IO.Ports.Parity>(_parity, out System.IO.Ports.Parity parity);
                 this.parity = parity;
@@ -88,11 +96,15 @@ namespace ModbusRTU_Viewer
 
                 Console.WriteLine("{0}", config.DataModel);
 
+                // Set DataType of Value
                 var _datatype = config.DataModel.DataType.Value.Replace("\"", "");
                 Enum.TryParse<DataModel.DataType>(_datatype, out DataModel.DataType dataType);
+                // Set Type of Register
                 var _type = config.DataModel.Type.Value.Replace("\"", "");
                 Enum.TryParse<DataModel.Type>(_type, out DataModel.Type type);
+                
 
+                // Create DataModell dependend on DataType
                 switch (dataType)
                 {
                     case DataModel.DataType.String:
@@ -107,7 +119,7 @@ namespace ModbusRTU_Viewer
                         dataModel.RegisterType = config.DataModel.Type.Value.ToLower();
                         break;
                     default:
-
+                        // Check if Datamodel has a Attribute called "Format"
                         if (config.DataModel["Format"] != null)
                         {
                             dataModel = new DataModel(
@@ -118,11 +130,6 @@ namespace ModbusRTU_Viewer
                                 dataType,
                                 config.DataModel.Format.Value
                                 );
-                            dataModel.RegisterType = config.DataModel.Type.Value.ToLower();
-                            for (int i = 0; i < View.Columns.Count; i++)
-                            {
-                                View.Columns[i].DisplayMemberBinding = new Binding(DisplayRow.getAttributes()[i]);
-                            }
 
                         }
                         else
@@ -135,32 +142,22 @@ namespace ModbusRTU_Viewer
                                 dataType,
                                 new Unit(config.DataModel.Unit.Value)
                                 );
-                            dataModel.RegisterType = config.DataModel.Type.Value.ToLower();
-                            for (int i = 0; i < View.Columns.Count; i++)
-                            {
-                                View.Columns[i].DisplayMemberBinding = new Binding(DisplayRow.getAttributes()[i]);
-                            }
                         }
                         break;
+                }
+                // Add RegisterType tp DataModel
+                dataModel.RegisterType = config.DataModel.Type.Value.ToLower();
+
+                // Bind Data to Columns
+                for (int i = 0; i < View.Columns.Count; i++)
+                {
+                    View.Columns[i].DisplayMemberBinding = new Binding(DisplayRow.getAttributes()[i]);
                 }
             }
 
         }
 
-        public bool HasProperty( object obj, string propertyName)
-        {
-            Type t = obj.GetType();
-            PropertyInfo p = t.GetProperty(propertyName);
-            if (p == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
+        // Add a new Row to Listview to display another Device
         public bool addRow(DisplayRow row)
         {
 
@@ -190,6 +187,7 @@ namespace ModbusRTU_Viewer
             return false;
         }
 
+        // EventHandler to Remove Glow in ListView
         private void GridViewColumnHeader_Loaded(object sender, RoutedEventArgs e)
         {
             GridViewColumnHeader columnHeader = sender as GridViewColumnHeader;

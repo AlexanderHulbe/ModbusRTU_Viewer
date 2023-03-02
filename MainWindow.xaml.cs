@@ -411,6 +411,7 @@ namespace ModbusRTU_Viewer
                             );
                     }
 
+                    // Add new Row to Information Object
                     info.addRow(row);
 
 
