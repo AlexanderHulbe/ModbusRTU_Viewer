@@ -1,0 +1,23 @@
+﻿{
+	"Name": "SISGEO Tiltmeter",
+	"Headers": [
+		"Slave Adress",
+		"Register",
+		"HEX Wert",
+		"Name",
+		"Messwert",
+		"Einheit"
+	],
+	"Slaves_Count": 1,
+	"Parity": "None",
+	"StopBits": 1,
+	"Baudrate": 9600,
+	"DataModel": {
+		"Name": "COUNT",
+		"Address": "100",
+		"Type": "InputRegister",
+		"count_of_Addresses": 1,
+		"DataType": "uint32",
+		"Unit": "Digits"
+	}
+}

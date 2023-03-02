@@ -3,20 +3,21 @@
 	"Headers": [
 		"Slave Adress",
 		"Register",
-		"Wert",
+		"HEX Wert",
 		"Name",
-		"SerienNummer"
+		"Messwert",
+		"Einheit"
 	],
-	"Slaves_Count": 2,
+	"Slaves_Count": 3,
 	"Parity": "None",
 	"StopBits": 1,
 	"Baudrate": 9600,
 	"DataModel": {
-		"Name": "SerialNumber",
-		"Address": "40012",
+		"Name": "P1",
+		"Address": "40008",
 		"Type": "HoldingRegister",
 		"count_of_Addresses": 2,
 		"DataType": "uint32",
-		"Format": "DD.MM.YY.XXXX"
+		"Unit": "Digits"
 	}
 }

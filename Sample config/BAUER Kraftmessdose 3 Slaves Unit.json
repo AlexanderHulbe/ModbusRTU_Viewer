@@ -3,21 +3,20 @@
 	"Headers": [
 		"Slave Adress",
 		"Register",
-		"Wert",
+		"HEX Wert",
 		"Name",
-		"Messwert",
 		"Einheit"
 	],
-	"Slaves_Count": 1,
+	"Slaves_Count": 3,
 	"Parity": "None",
 	"StopBits": 1,
 	"Baudrate": 9600,
 	"DataModel": {
-		"Name": "ADC RAW Value",
-		"Address": "40050",
+		"Name": "Unit",
+		"Address": "40003",
 		"Type": "HoldingRegister",
-		"count_of_Addresses": 2,
+		"count_of_Addresses": 1,
 		"DataType": "uint32",
-		"Unit": "Digits"
+		"Unit":""
 	}
 }

@@ -1,0 +1,22 @@
+﻿{
+	"Name": "BAUER Kraftmessdose",
+	"Headers": [
+		"Slave Adress",
+		"Register",
+		"HEX Wert",
+		"Name",
+		"Version"
+	],
+	"Slaves_Count": 1,
+	"Parity": "None",
+	"StopBits": 1,
+	"Baudrate": 9600,
+	"DataModel": {
+		"Name": "Firmware",
+		"Address": "40002",
+		"Type": "HoldingRegister",
+		"count_of_Addresses": 1,
+		"DataType": "uint32",
+		"Format": "X.XX.X"
+	}
+}

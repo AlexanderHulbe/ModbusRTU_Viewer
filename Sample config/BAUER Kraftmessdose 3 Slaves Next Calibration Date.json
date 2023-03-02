@@ -1,0 +1,22 @@
+﻿{
+	"Name": "BAUER Kraftmessdose",
+	"Headers": [
+		"Slave Adress",
+		"Register",
+		"HEX Werte",
+		"Name",
+		"Datum"
+	],
+	"Slaves_Count": 3,
+	"Parity": "None",
+	"StopBits": 1,
+	"Baudrate": 9600,
+	"DataModel": {
+		"Name": "Next Calibration Date",
+		"Address": "40016",
+		"Type": "HoldingRegister",
+		"count_of_Addresses": 2,
+		"DataType": "uint32",
+		"Format": "DD.MM.YY"
+	}
+}

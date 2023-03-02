@@ -1,0 +1,23 @@
+﻿{
+	"Name": "BAUER Kraftmessdose",
+	"Headers": [
+		"Slave Adress",
+		"Register",
+		"HEX Wert",
+		"Name",
+		"Messwert",
+		"Einheit"
+	],
+	"Slaves_Count": 3,
+	"Parity": "None",
+	"StopBits": 1,
+	"Baudrate": 9600,
+	"DataModel": {
+		"Name": "Nominal Load",
+		"Address": "40018",
+		"Type": "HoldingRegister",
+		"count_of_Addresses": 1,
+		"DataType": "uint32",
+		"Unit": "kN"
+	}
+}

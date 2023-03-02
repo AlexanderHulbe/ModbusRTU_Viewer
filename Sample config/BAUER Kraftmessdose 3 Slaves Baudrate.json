@@ -3,20 +3,20 @@
 	"Headers": [
 		"Slave Adress",
 		"Register",
-		"Wert",
+		"HEX Wert",
 		"Name",
-		"Datum"
+		"Baudrate"
 	],
-	"Slaves_Count": 1,
+	"Slaves_Count": 3,
 	"Parity": "None",
 	"StopBits": 1,
 	"Baudrate": 9600,
 	"DataModel": {
-		"Name": "Last Calibration Date",
-		"Address": "40014",
+		"Name": "Baudrate",
+		"Address": "40005",
 		"Type": "HoldingRegister",
-		"count_of_Addresses": 2,
+		"count_of_Addresses": 1,
 		"DataType": "uint32",
-		"Format": "DD.MM.YY"
+		"Unit":""
 	}
 }
