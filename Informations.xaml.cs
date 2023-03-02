@@ -50,7 +50,7 @@ namespace ModbusRTU_Viewer
                     var head = item.Replace("\"", "");
                     headers.Add(head);
                     GridViewColumn col = new GridViewColumn();
-                    col.Width = App.Current.MainWindow.Width / len_headers - 10;
+                    col.Width = (App.Current.MainWindow.Width - 22) / len_headers ;
                     col.Header = head;
                     View.Columns.Add(col);
                 }

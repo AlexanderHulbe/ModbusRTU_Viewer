@@ -42,14 +42,16 @@ namespace ModbusRTU_Viewer
 
         public DataModel(string name, string address, Type type, int Count_of_Addresses, DataType dataType) {
             Name = name;
-            Address = address.TrimStart(trimChars: '4');
+            //Address = address.TrimStart(trimChars: '4');
+            Address = address;
             this.type = type;
             this.Count_of_Addresses = Count_of_Addresses;
             this.dataType = dataType;
         }
         public DataModel(string name, string address, Type type, int Count_of_Addresses, DataType dataType, string Format) {
             Name = name;
-            Address = address.TrimStart(trimChars: '4');
+            //Address = address.TrimStart(trimChars: '4');
+            Address = address;
             this.type = type;
             this.Count_of_Addresses = Count_of_Addresses;
             this.dataType = dataType;
@@ -57,7 +59,8 @@ namespace ModbusRTU_Viewer
         }
         public DataModel(string name, string address, Type type, int Count_of_Addresses, DataType dataType, Unit Unit) {
             Name = name;
-            Address = address.TrimStart(trimChars: '4');
+            //Address = address.TrimStart(trimChars: '4');
+            Address = address;
             this.type = type;
             this.Count_of_Addresses = Count_of_Addresses;
             this.dataType = dataType;
@@ -65,7 +68,8 @@ namespace ModbusRTU_Viewer
         }
         public DataModel(string name, string address, Type type, int Count_of_Addresses, DataType dataType, int Length_of_DataTypeString) {
             Name = name;
-            Address = address.TrimStart(trimChars: '4');
+            //Address = address.TrimStart(trimChars: '4');
+            Address = address;
             this.type = type;
             this.Count_of_Addresses = Count_of_Addresses;
             this.dataType = dataType;

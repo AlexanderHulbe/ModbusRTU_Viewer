@@ -87,9 +87,9 @@
             x:Name="DD_ComPorts"
             Grid.Column="2" 
             HorizontalAlignment="Left" 
-            Margin="153,0,0,0" 
+            Margin="101,0,0,0" 
             VerticalAlignment="Center" 
-            Width="120"
+            Width="172"
             Background="Transparent" 
             Height="22" 
             ItemsSource="{Binding Path=ComPorts}"
@@ -130,7 +130,7 @@
             NavigationUIVisibility="Hidden" 
             x:Name="Frame"
             />
-        
+
         <!-- Footer -->
         <TextBox
             x:Name="DataField"

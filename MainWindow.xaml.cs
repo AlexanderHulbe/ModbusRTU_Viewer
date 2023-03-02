@@ -3,6 +3,9 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Ports;
+using System.Linq;
+using System.Management;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Threading;
@@ -14,7 +17,7 @@ namespace ModbusRTU_Viewer
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        
         List<int> Baudraten = new List<int>()
                     {
                         9600,
@@ -39,6 +42,7 @@ namespace ModbusRTU_Viewer
         bool firstConfigLoad = true;
         bool isConfigLoaded = false;
         String port;
+        int scanrate;
         bool WrongPort = true;
         DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
 
@@ -60,18 +64,26 @@ namespace ModbusRTU_Viewer
         }
         private List<String> GetComPorts()
         {
-            // Get a list of serial port names.
-            string[] ports = System.IO.Ports.SerialPort.GetPortNames();
-
-            Console.WriteLine("The following serial ports were found:");
-
-            // Display each port name to the console.
-            foreach (string port in ports)
+            List<string> portList;
+            
+            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption like '%(COM%'"))
             {
-                Console.WriteLine(port);
+                // Get a list of serial port names.
+                var portnames = SerialPort.GetPortNames();
+                var port = searcher.Get().Cast<ManagementBaseObject>().ToList().Select(p => p["Caption"].ToString());
+
+                portList = portnames.Select(n => n + " - " + port.FirstOrDefault(s => s.Contains(n))).ToList();
+
+                // Display each port name to the console.
+                Console.WriteLine("The following serial ports were found:");
+                foreach (string s in portList)
+                {
+                    Console.WriteLine(s);
+                }
+
             }
 
-            return new List<string>(ports);
+            return new List<string>(portList);
         }
         private void resetClients()
         {
@@ -115,14 +127,16 @@ namespace ModbusRTU_Viewer
 
 
                     //addLineToDataField(info.config);
-                    addLineToDataField("New Config Loaded",true);
+                    var confName = info.config.Name.Value;
+                    addLineToDataField(confName+" Config Loaded",true);
                     isConfigLoaded = true;
 
                     if (!String.IsNullOrEmpty(port))
                     {
                         connectToClients(port);
                         //readData();
-                        SetupTimer();
+                        if (!WrongPort)
+                            SetupTimer();
                         firstConfigLoad = false;
                     }
 
@@ -179,30 +193,34 @@ namespace ModbusRTU_Viewer
         }
         private bool isAlive(ModbusClient client)
         {
-
-            for (int i = 0; i < 130; i++)
+            int addr = Int32.Parse(info.dataModel.Address);
+            try
             {
-                try
-                {
-                    var temp = client.ReadHoldingRegisters(0 + i, 1)[0];
-                    return true;
-                }
-                catch (Exception)
-                {
-                    //throw;
-                }
-                try
-                {
-                    var temp = client.ReadInputRegisters(0 + i, 1)[0].ToString("X4");
-                    return true;
-                }
-                catch (Exception)
-                {
-                    //throw;
-                }
-                
+                var temp = client.ReadHoldingRegisters(addr, 1)[0];
+                return true;
+            }
+            catch (Exception)
+            {
+                dispatcherTimer.Stop();
+                output("Kein Modbus Gerät an Port: " + port);
+                return false;
+                //throw;
+            }
+            try
+            {
+                var temp = client.ReadInputRegisters(addr, 1)[0].ToString("X4");
+                return true;
+            }
+            catch (Exception)
+            {
+                dispatcherTimer.Stop();
+                output("Kein Modbus Gerät an Port: " + port);
+                return false;
+                //throw;
             }
 
+            dispatcherTimer.Stop();
+            output("Kein Modbus Gerät an Port: " + port);
             return false;
         }
         private void readData()
@@ -216,7 +234,7 @@ namespace ModbusRTU_Viewer
 
                 for (int i = 0; i < count; i++)
                 {
-                    registers += (40000+addr + i).ToString() + " & ";
+                    registers += (addr + i).ToString() + " & ";
                 }
                 registers = registers.TrimEnd(' ').TrimEnd('&').TrimEnd(' ');
                 for (int slave = Int32.Parse(slave_addr_start.Text); slave <= info.slaves; slave++)
@@ -336,16 +354,20 @@ namespace ModbusRTU_Viewer
         }
         private void SetupTimer()
         {
-            //  DispatcherTimer setup
+            // DispatcherTimer setup
             dispatcherTimer.Stop();
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0,0, int.Parse(scan_rate.Text)); //Intervall aus Textbox
+            scanrate = int.Parse(scan_rate.Text); //Intervall aus Textbox
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0,0, scanrate); 
             dispatcherTimer.Start();
         }
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if (isConfigLoaded && !String.IsNullOrEmpty(port))
+            if (scanrate == int.Parse(scan_rate.Text))
             {
-                readData();
+                if (isConfigLoaded && !String.IsNullOrEmpty(port))
+                {
+                    readData();
+                }
             }
         }
         private dynamic convert(string val, DataModel.DataType datatype)
@@ -469,7 +491,8 @@ namespace ModbusRTU_Viewer
         }
         private void DD_ComPorts_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            port = DD_ComPorts.SelectedItem.ToString();
+            //Trim String of COM Port to only COMX
+            port = DD_ComPorts.SelectedItem.ToString().Split('-')[0].Trim();
             addLineToDataField("COM Port ausgewählt: "+port);
             WrongPort = true;
             if (isConfigLoaded)
@@ -478,13 +501,15 @@ namespace ModbusRTU_Viewer
                 resetClients();
                 connectToClients(port);
                 //readData(); 
-                SetupTimer();
+                if (!WrongPort)
+                    SetupTimer();
             }
         }
         private void scan_rate_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             dispatcherTimer.Stop();
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, int.Parse(scan_rate.Text));
+            scanrate = int.Parse(scan_rate.Text);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, scanrate);
             dispatcherTimer.Start();
         }
         private void output(dynamic data)
