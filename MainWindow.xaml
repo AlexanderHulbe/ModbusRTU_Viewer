@@ -11,9 +11,11 @@
         ResizeMode="NoResize"
         FocusManager.FocusedElement="{x:Reference DataField}"
         >
+    <!-- Grid for Window -->
     <Grid
         Background="#F5F5F5"
         >
+        <!-- Define Rows in Grid -->
         <Grid.RowDefinitions>
             <RowDefinition 
                 x:Name="header" 
@@ -26,6 +28,7 @@
                 MaxHeight="120"
                 />
         </Grid.RowDefinitions>
+        <!-- Define Columns -->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="127*"/>
             <ColumnDefinition Width="212*"/>
@@ -34,115 +37,123 @@
         </Grid.ColumnDefinitions>
 
         <!-- Header -->
-        <!-- COL 1 -->
+            <!-- COL 1 -->
+                <!-- Load Config Button -->
+                <Button  
+                    Name="btn_loadConfig"
+                    Content="Load Config"
+                    FontSize="16"
+                    Background="LightGray"
+                    BorderThickness="0"
+                    Margin="16,8,16,8" Click="btn_loadConfig_Click">
 
-        <Button  
-            Name="btn_loadConfig"
-            Content="Load Config"
-            FontSize="16"
-            Background="LightGray"
-            BorderThickness="0"
-            Margin="16,8,16,8" Click="btn_loadConfig_Click">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
 
-            <Button.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="CornerRadius" Value="5"/>
-                </Style>
-            </Button.Resources>
+                </Button>
 
-        </Button>
-
-        <!-- COL 2 -->
-        <Label 
-            Grid.Column="1" 
-            Content="Scan Rate (ms)" 
-            FontSize="16"
-            HorizontalAlignment="Left" 
-            Margin="15,0,0,0" 
-            VerticalAlignment="Center" Height="32" Width="114"
-            />
-        <TextBox 
-            x:Name="scan_rate"
-            Grid.Column="1" 
-            HorizontalAlignment="Right" 
-            Margin="0,0,15,0" 
-            TextWrapping="NoWrap" 
-            Text="1000" 
-            FontSize="16"
-            VerticalAlignment="Center" 
-            Width="60"
-            TextChanged="scan_rate_TextChanged"/>
+            <!-- COL 2 -->
+                <!-- Label for ScanRate -->
+                <Label 
+                    Grid.Column="1" 
+                    Content="Scan Rate (ms)" 
+                    FontSize="16"
+                    HorizontalAlignment="Left" 
+                    Margin="15,0,0,0" 
+                    VerticalAlignment="Center" Height="32" Width="114"
+                    />
+                <!-- Input Field for ScanRate -->
+                <TextBox 
+                    x:Name="scan_rate"
+                    Grid.Column="1" 
+                    HorizontalAlignment="Right" 
+                    Margin="0,0,15,0" 
+                    TextWrapping="NoWrap" 
+                    Text="1000" 
+                    FontSize="16"
+                    VerticalAlignment="Center" 
+                    Width="60"
+                    TextChanged="scan_rate_TextChanged"
+                    />
 
 
-        <!-- COL 3 -->
-        <Label 
-            Grid.Column="2" 
-            Content="COM Port " 
-            HorizontalAlignment="Left" 
-            Margin="15,0,0,0" 
-            VerticalAlignment="Center"
-            Width="129" FontSize="16" Height="32"
-            />
-        <ComboBox
-            x:Name="DD_ComPorts"
-            Grid.Column="2" 
-            HorizontalAlignment="Left" 
-            Margin="101,0,0,0" 
-            VerticalAlignment="Center" 
-            Width="172"
-            Background="Transparent" 
-            Height="22" 
-            ItemsSource="{Binding Path=ComPorts}"
-            SelectionChanged="DD_ComPorts_SelectionChanged"
-            />
+            <!-- COL 3 -->
+                <!-- Label for COM Port -->
+                <Label 
+                    Grid.Column="2" 
+                    Content="COM Port " 
+                    HorizontalAlignment="Left" 
+                    Margin="15,0,0,0" 
+                    VerticalAlignment="Center"
+                    Width="129" FontSize="16" Height="32"
+                    />
+                <!-- DropDown Menu for COM Ports -->
+                <ComboBox
+                    x:Name="DD_ComPorts"
+                    Grid.Column="2" 
+                    HorizontalAlignment="Left" 
+                    Margin="101,0,0,0" 
+                    VerticalAlignment="Center" 
+                    Width="172"
+                    Background="Transparent" 
+                    Height="22" 
+                    ItemsSource="{Binding Path=ComPorts}"
+                    SelectionChanged="DD_ComPorts_SelectionChanged"
+                    />
 
-        <!-- COL 4 -->
-        <Label 
-            Grid.Column="3" 
-            Content="Slave Addr start" 
-            HorizontalAlignment="Left" 
-            Margin="15,0,0,0" 
-            VerticalAlignment="Center"
-            Width="129" FontSize="16" Height="32"
-            />
-
-        <TextBox 
-            x:Name="slave_addr_start"
-            Grid.Column="3" 
-            HorizontalAlignment="Left" 
-            Margin="168,0,0,0" 
-            TextWrapping="NoWrap"
-            MaxLength="10"
-            Text="1" 
-            FontSize="16"
-            VerticalAlignment="Center" 
-            Height="20"
-            Width="94"
-            MaxLines="2147483646"
-            />
+            <!-- COL 4 -->
+                <!-- Label for starting Slave Address -->
+                <Label 
+                    Grid.Column="3" 
+                    Content="Slave Addr start" 
+                    HorizontalAlignment="Left" 
+                    Margin="15,0,0,0" 
+                    VerticalAlignment="Center"
+                    Width="129" FontSize="16" Height="32"
+                    />
+                <!-- InputField for starting Slave Address -->
+                <TextBox
+                    x:Name="slave_addr_start"
+                    Grid.Column="3" 
+                    HorizontalAlignment="Left" 
+                    Margin="168,0,0,0" 
+                    TextWrapping="NoWrap"
+                    MaxLength="10"
+                    Text="1" 
+                    FontSize="16"
+                    VerticalAlignment="Center" 
+                    Height="20"
+                    Width="94"
+                    MaxLines="2147483646"
+                    />
 
 
 
         <!-- Body -->
-        <Frame 
-            Grid.Row="1" 
-            Grid.ColumnSpan="4" 
-            NavigationUIVisibility="Hidden" 
-            x:Name="Frame"
-            />
+            <!-- Display Frame for Data that is fetched -->
+            <Frame 
+                Grid.Row="1" 
+                Grid.ColumnSpan="4" 
+                NavigationUIVisibility="Hidden" 
+                x:Name="Frame"
+                />
 
         <!-- Footer -->
-        <TextBox
-            x:Name="DataField"
-            Margin="10"
-            Grid.Column="0"
-            Grid.ColumnSpan="4"
-            Grid.Row="2"
-            IsUndoEnabled="False" 
-            IsReadOnly="True"
-            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-            ScrollViewer.VerticalScrollBarVisibility="Auto"
-        />
+            <!-- Display Live Data including Timestamp and Error Messages -->
+            <TextBox
+                x:Name="DataField"
+                Margin="10"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Grid.Row="2"
+                IsUndoEnabled="False" 
+                IsReadOnly="True"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+            />
 
 
 
