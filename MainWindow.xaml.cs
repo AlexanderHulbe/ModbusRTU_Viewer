@@ -68,6 +68,20 @@ namespace ModbusRTU_Viewer
             {
                 // Create Directory
                 Directory.CreateDirectory(App.pathString);
+                var sourcePath = "./Sample config";
+                if (Directory.Exists(App.pathString))
+                {
+                    string[] files = Directory.GetFiles(sourcePath);
+
+                    // Copy the files and overwrite destination files if they already exist.
+                    foreach (string s in files)
+                    {
+                        // Use static Path methods to extract only the file name from the path.
+                        var fileName = Path.GetFileName(s);
+                        var destFile = Path.Combine(App.pathString, fileName);
+                        File.Copy(s, destFile, false);
+                    }
+                }
             }
         }
         

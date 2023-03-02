@@ -150,27 +150,69 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Sample config\BAUER Kraftmessdose 1 Slave ADC RAW Value.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 1 Slave Firmware.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 1 Slave Force Integer.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 1 Slave Last Calibration Date.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 1 Slave Next Calibration Date.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 1 Slave SerialNumber.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 1 Slave Unit.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 2 Slaves SerialNumber.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves ADC RAW Value.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves Baudrate.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves Calibration Load.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves Firmware.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves Force Integer.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves Last Calibration Date.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves Next Calibration Date.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves Nominal Load.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves P0.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves P1.json" />
-    <None Include="Sample config\BAUER Kraftmessdose 3 Slaves Unit.json" />
-    <None Include="Sample config\SISGEO Tiltmeter 1 Slave Count.json" />
-    <None Include="Sample config\SISGEO Tiltmeter 3 Slave Count.json" />
+    <Content Include="Sample config\BAUER Kraftmessdose 1 Slave ADC RAW Value.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 1 Slave Firmware.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 1 Slave Force Integer.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 1 Slave Last Calibration Date.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 1 Slave Next Calibration Date.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 1 Slave SerialNumber.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 1 Slave Unit.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 2 Slaves SerialNumber.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves ADC RAW Value.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves Baudrate.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves Calibration Load.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves Firmware.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves Force Integer.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves Last Calibration Date.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves Next Calibration Date.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves Nominal Load.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves P0.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves P1.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\BAUER Kraftmessdose 3 Slaves Unit.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\SISGEO Tiltmeter 1 Slave Count.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sample config\SISGEO Tiltmeter 3 Slave Count.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
