@@ -26,7 +26,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>false</MapFileExtensions>
     <ProductName>ModbusRTU_Viewer</ProductName>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -102,6 +102,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DisplayRow.cs" />
+    <Compile Include="Tiltmeter.cs" />
     <Compile Include="Unit.cs" />
     <Page Include="Informations.xaml">
       <SubType>Designer</SubType>

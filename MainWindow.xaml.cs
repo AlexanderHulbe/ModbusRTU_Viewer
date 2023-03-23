@@ -261,9 +261,9 @@ namespace ModbusRTU_Viewer
             // SlaveID of Modbus Device
             int addr = Int32.Parse(info.dataModel.Address);
             // Switch on RegisterType defined in config
-            switch (info.dataModel.RegisterType)
+            switch (info.dataModel.type)
             {
-                case "holdingregister":
+                case DataModel.Type.HoldingRegister:
                     // Try reaching Modbusdevice on RegisterAddress From Config as HoldingRegister
                     try
                     {
@@ -277,11 +277,13 @@ namespace ModbusRTU_Viewer
                         return false;
                         //throw;
                     }
-                case "inputregister":
+                case DataModel.Type.InputRegister:
                     // Try reaching Modbusdevice on RegisterAddress From Config as InputRegister
                     try
                     {
-                        var temp = client.ReadInputRegisters(addr, 1)[0];
+                        var _addr = UInt32.Parse(addr + "", System.Globalization.NumberStyles.HexNumber);
+                        var __addr = int.Parse(_addr + "");
+                        var temp = client.ReadInputRegisters(__addr, 1)[0];
                         return true;
                     }
                     catch (Exception)
@@ -326,14 +328,19 @@ namespace ModbusRTU_Viewer
                     // Set the 
                     clients[0].UnitIdentifier = (byte) slave;
 
+                    String disval = "";
+                    string[] RawData = null;
+                    dynamic decVal = null;
+
                     // read all the registers for one Value
                     for (int i = 0; i < count; i++)
                     {
                         dynamic hex = "";
+                        
                         // Switch on RegisterType
-                        switch (info.dataModel.RegisterType)
+                        switch (info.dataModel.type)
                         {
-                            case "holdingregister":
+                            case DataModel.Type.HoldingRegister:
                                 dynamic _hex;
                                 try
                                 {
@@ -348,16 +355,55 @@ namespace ModbusRTU_Viewer
                                     throw;
                                 }
                                 break;
-                            case "inputregister":
+                            case DataModel.Type.InputRegister:
                                 try
                                 {
-                                    var _addr = UInt32.Parse(addr+"", System.Globalization.NumberStyles.HexNumber);
+                                    if(info.config.Name.Value.ToLower() == "sisgeo tiltmeter")
+                                    {
+                                        Tiltmeter tilt = new Tiltmeter();
+                                        Tiltmeter.Options wanted = Tiltmeter.Options.Null;
+                                        switch (info.config.DataModel.Name.Value.ToLower())
+                                        {
+                                            case "temperatur":
+                                                wanted = Tiltmeter.Options.Temperature;
+                                                break;
+                                            case "siny":
+                                                wanted = Tiltmeter.Options.SinY;
+                                                break;
+                                            case "sinx":
+                                                wanted = Tiltmeter.Options.SinX;
+                                                break;
+                                            case "rawy":
+                                                wanted = Tiltmeter.Options.RawY;
+                                                break;
+                                            case "rawx":
+                                                wanted = Tiltmeter.Options.RawX;
+                                                break;
+                                            case "rawtemperatur":
+                                                wanted = Tiltmeter.Options.RawTemperature;
+                                                break;
+                                            default:
+                                                break;
+                                        }
 
-                                    var __addr = int.Parse(_addr+"");
+                                        var temp = tilt.get(wanted, clients[0]);
+                                        RawData = temp[0].Split(' ');
+                                        disval = temp[0];
+                                        decVal = temp[1];
+                                        tilt = null;
+                                    }
+                                    else
+                                    {
+                                        var _addr = UInt32.Parse(addr + "", System.Globalization.NumberStyles.HexNumber);
 
-                                    var temp = clients[0].ReadInputRegisters(__addr + i, 1);
-                                    var _temp = temp[0];
-                                    hex = _temp.ToString("X4");
+                                        var __addr = int.Parse(_addr + "");
+
+                                        var temp = clients[0].ReadInputRegisters(__addr + i, 1);
+                                        var _temp = temp[0];
+                                        hex = _temp.ToString("X4");
+                                    }
+
+                                    
                                 }
                                 catch (Exception)
                                 {
@@ -372,35 +418,44 @@ namespace ModbusRTU_Viewer
                                 output("Default in convert Function!");
                                 break;
                         }
-                        while (hex.Length > 4)
+                        if (info.config.Name.Value.ToLower() != "sisgeo tiltmeter")
                         {
-                            hex = hex.Substring(1);
+                            while (hex.Length > 4)
+                            {
+                                hex = hex.Substring(1);
+                            }
+                            if (!String.IsNullOrEmpty(hex))
+                            {
+                                output("Slave " + clients[0].UnitIdentifier + " Addr: " + (addr + i) + " => " + hex);
+                                data.Add(hex);
+                            }
                         }
-                        if (!String.IsNullOrEmpty(hex))
+                        else
                         {
-                            output("Slave " + clients[0].UnitIdentifier + " Addr: " + (addr + i) + " => " + hex);
-                            data.Add(hex);
+                            output("Slave " + clients[0].UnitIdentifier + " Addr: " + (addr + i) + " => " + RawData[i]);
                         }
                     }
-                    String val = "";
-                    String disval = "";
-                    foreach (var item in data)
+                    
+                    
+                    if (info.config.Name.Value.ToLower() != "sisgeo tiltmeter")
                     {
-                        val += item;
-                        disval += item + " ";
-                    }
+                        String val = "";
+                        foreach (var item in data)
+                        {
+                            val += item;
+                            disval += item + " ";
+                        }
 
-                    dynamic decVal = null;
+                        if (info.dataModel.format != null)
+                        {
+                            decVal = convert(val, info.dataModel.dataType, info.dataModel.format);
+                        }
+                        else
+                        {
+                            decVal = convert(val, info.dataModel.dataType);
+                        }
 
-                    if (info.dataModel.format != null)
-                    {
-                        decVal = convert(val, info.dataModel.dataType, info.dataModel.format);
                     }
-                    else
-                    {
-                        decVal = convert(val, info.dataModel.dataType);
-                    }
-
                     DisplayRow row = null;
 
                     if (info.dataModel.Unit != null)

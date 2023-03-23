@@ -13,7 +13,7 @@ namespace ModbusRTU_Viewer
         public enum Type
         {
             HoldingRegister,
-            InputRegisters,
+            InputRegister,
             SingleRegister
         }
 
