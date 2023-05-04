@@ -325,7 +325,7 @@ namespace ModbusRTU_Viewer
                 {
                     // Create a List of strings that will contain the read data
                     List<String> data = new List<String>();
-                    // Set the 
+                    // Set the slaveID
                     clients[0].UnitIdentifier = (byte) slave;
 
                     String disval = "";
